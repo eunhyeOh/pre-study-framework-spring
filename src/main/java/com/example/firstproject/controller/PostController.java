@@ -63,4 +63,13 @@ public class PostController {
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
     }
+
+    @PostMapping("/post/transaction-test")
+    public ResponseEntity<List<Post>>  transactionTest(@RequestBody List<PostForm> dtos){
+        List<Post> createdList = postService.createPosts(dtos);
+
+        return (createdList != null)?
+                ResponseEntity.status(HttpStatus.OK).body(createdList) :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
 }

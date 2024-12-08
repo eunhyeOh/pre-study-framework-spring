@@ -6,8 +6,10 @@ import com.example.firstproject.repository.PostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -65,5 +67,23 @@ public class PostService {
             postRepository.delete(target);
             return target;
         }
+    }
+
+    @Transactional
+    public List<Post> createPosts(List<PostForm> dtos) {
+        //1. dto 묶을을 entity 묶음으로 변환
+        List<Post> postList = dtos.stream()
+                .map(dto -> dto.toEntity())
+                .collect(Collectors.toList());
+
+        //2. entity묶을음 DB에 저장
+        postList.stream().forEach(post -> postRepository.save(post));
+
+        //3. 강제 예외 발생
+        postRepository.findById(-1L)
+                .orElseThrow(() -> new IllegalArgumentException("게시글 등록 실패!!"));
+
+        //4. 결과 값 반환
+        return postList;
     }
 }
